@@ -1,2 +1,4 @@
 # SYS-480
 > Tech Journal for Advanced Topics in SysAdmin
+
+[Milestone Bare Metal 1 - ESXi Setup](https://github.com/seabar24/SYS-480/wiki/Milestone-Bare-Metal-1-%E2%80%90-ESXi-Setup)
