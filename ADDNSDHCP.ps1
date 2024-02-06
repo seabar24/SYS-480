@@ -25,5 +25,5 @@ Add-DHCPServerv4Scope -Name “$name-scope” -StartRange 10.0.17.101 -EndRange 
 Set-DHCPServerv4Scope -ScopeID 10.0.17.0 -Name “$name-scope” -State Active -LeaseDuration 1.00:00:00
 Set-DHCPServerv4OptionValue -ScopeID 10.0.17.0 -DnsDomain dc1.$name.local -DnsServer 10.0.17.4 -Router 10.0.17.2
 # Following must be run as the new adm user
-Add-DhcpServerInDC -DnsName dc1.$name.local -IPAddress 10.0.17.4
+Add-DhcpServerInDC -DnsName "dc1.$name.local" -IPAddress 10.0.17.4
 Restart-service dhcpserver
