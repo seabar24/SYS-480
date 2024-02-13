@@ -8,7 +8,7 @@ $vm=Get-VM -Name $vmname
 $snapshot = Get-Snapshot -VM $vm -Name "Base"
 $hostsname = Read-Host -prompt "Enter the name of your VM Host Server"
 $vmhost = Get-VMHost -Name $hostsname
-$dsname = "Enter the name of the Datastore you want to use"
+$dsname = Read-Host -prompt "Enter the name of the Datastore you want to use"
 $ds=Get-DataStore -Name $dsname
 $linkedName = "{0}.linked" -f $vm.name
 #Create the tempory VM
