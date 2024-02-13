@@ -14,7 +14,8 @@ $linkedName = "{0}.linked" -f $vm.name
 #Create the tempory VM
 $linkedvm = New-VM -LinkedClone -Name $linkedName -VM $vm -ReferenceSnapshot $snapshot -VMHost $vmhost -Datastore $ds
 #Create the Full VM
-$newvm = New-VM -Name "server.2019.base.v2" -VM $linkedvm -VMHost $vmhost -Datastore $ds
+$newvmname = Read-Host -prompt "Enter the name for your New VM"
+$newvm = New-VM -Name $newvmname -VM $linkedvm -VMHost $vmhost -Datastore $ds
 #A new Snap Shot
 $newvm | New-Snapshot -Name "Base"
 #Cleanup the temporary linked clone
