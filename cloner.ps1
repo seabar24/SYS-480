@@ -1,9 +1,9 @@
 #Connect
-$vserver=Read-Host -prompt "Enter your vCenter Server (i.e vcenter.yourname.local): "
+$vserver=Read-Host -prompt "Enter your vCenter Server (i.e vcenter.yourname.local) "
 Connect-VIServer($vserver)
 #Source VM
 Get-VM
-Read-Host -prompt "Enter the name of the VM you wish to make a Linked Clone of: "
+$vmname = Read-Host -prompt "Enter the name of the VM you wish to make a Linked Clone of "
 $vm=Get-VM -Name $vmname
 $snapshot = Get-Snapshot -VM $vm -Name "Base"
 $vmhost = Read-Host -prompt "Enter the name of your VM Host Server: "
