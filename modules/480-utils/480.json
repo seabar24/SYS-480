@@ -1,0 +1,7 @@
+{
+    "vcenter_server" : "vcenter.sean.local",
+    "vm_folder" : "BASEVM",
+    "esxi_host" : "super1",
+    "default_network" : "480-WAN"
+    
+}
