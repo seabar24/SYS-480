@@ -8,3 +8,5 @@
 [Milestone 3 - vCenter](https://github.com/seabar24/SYS-480/wiki/Milestone-3-%E2%80%90-vCenter)
 
 [Milestone 4 - VCenter AD Integration, PowerCLI, and Linked Clones](https://github.com/seabar24/SYS-480/wiki/Milestone-4-%E2%80%90-VCenter-AD-Integration,-PowerCLI-and-Linked-Clones)
+
+[Milestone 5 - 480.psm1](https://github.com/seabar24/SYS-480/wiki/Milestone-5-%E2%80%90-480.psm1)
