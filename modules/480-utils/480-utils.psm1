@@ -212,10 +212,48 @@ Function New-Network()
     $vsName = Read-Host "Enter the name for your new Virtual Switch"
     $pgName = Read-Host "Etner the name for your new Port Group"
 
-    $virtualSwitch = New-VirtualSwitch -VMHost $config.esxi_host -Name $vsName -Server $config.vcenter_server
-    $portGroup = New-VirtualPortGroup -VirtualSwitch $virtualSwitch -Name $pgName
+    if ($vsName -eq $pgName){
+        $virtualSwitch = New-VirtualSwitch -VMHost $config.esxi_host -Name $vsName -Server $config.vcenter_server
+        $portGroup = New-VirtualPortGroup -VirtualSwitch $virtualSwitch -Name $pgName
 
-    Write-Host -f "{$virtualSwitch.Name} and {$portGroup.Name} have been created"
-    return $virtualSwitch
-    return $portGroup
+        Write-Host "Virtual Switch: $($virtualSwitch.Name) and Port Group: $($portGroup.Name) have been created"
+        return $virtualSwitch
+        return $portGroup
+    } else {
+
+        Write-Host "Conflicting arguments for Virtual Switch and Port Group. Make sure they are both the same" -ForegroundColor Red
+        New-Network
+    }
+
+    $rmSwitch = Read-Host "Would you like to remove a Virtual Switch? (Y/N)"
+    $rmPortGroup = Read-Host "Would you like to remove a Virtual Switch? (Y/N)"
+
+    if ($rmSwitch -eq "^[yY]$"){
+        # Code for removing Virtual Switch
+        Get-VirtualSwitch
+        Remove-VirtualSwitch -VirtualSwitch $virswichosen
+        if ($rmPortGroup -eq "^[yY]$"){
+            # Code for removing Virtual Port Group
+        } elif ($rmPortGroup -eq "^[nN]$"){
+            return
+        }
+    } elif ($rmSwitch -eq "^[^nN]$"){
+        if ($rmPortGroup -eq "^[yY]$"){
+            # Code for removing Virtual Port Group
+        } elif ($rmPortGroup -eq "^[nN]$"){
+            return
+        } elif ($rmPortGroup -eq " "){
+            return
+        }
+        return
+    } elif ($rmSwitch -eq " "){
+        if ($rmPortGroup -eq "^[yY]$"){
+            # Code for removing Virtual Port Group
+        } elif ($rmPortGroup -eq "^[nN]$"){
+            return
+        } elif ($rmPortGroup -eq " "){
+            return
+        }
+        return
+    }
 }
