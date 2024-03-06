@@ -143,14 +143,15 @@ Function Select-DB()
     # Note this is a full on datastore object that we can interact with
     return $chosen_db
 }
-Function Select-Network([string] $vm)
+Function Select-Network([string] $esxi)
 {
     # This function gets the network from your vcenter
     # And returns the chosen network for the full clone
+    $vmhost = Get-VMHost -Name $esxi
     Write-Host "Select your Network Adapter:"
     $chosen_net=$null
     
-    $networks = Get-NetworkAdapter -VM $vm
+    $networks = $vmhost | Get-VirtualSwitch | Get-VirtualPortGroup
     $index=1
 
     # Checks if number of Vms is 0
@@ -170,13 +171,12 @@ Function Select-Network([string] $vm)
         $choice = Read-Host "Which index number [x] do you wish to pick?"
         if (ErrorHandling -index $choice -maxIndex $networks.Count){
 
-            $chosen_net = $networks[$choice - 1]
-            Write-Host "You picked " $chosen_net.Name
+            $chosen_net = $networks[$choice - 1].Name
+            Write-Host "You picked:" $chosen_net
         }
     } while ($chosen_net -eq $null)
-    {
-            return $chosen_net
-    }  
+    
+    return $chosen_net
 }
 
 Function FullClone([string] $vm, $snap, $vmhost, $ds, $network)
@@ -189,7 +189,8 @@ Function FullClone([string] $vm, $snap, $vmhost, $ds, $network)
     # Gets name of new Full Clone and creates it from linked clone
     $newvmname = Read-Host -prompt "Enter the name for your New VM"
     $newVM = New-VM -Name $newvmname -VM $linkedVM -VMHost $vmhost -Datastore $ds
-    $newVM | Set-NetworkAdapter -NetworkName $network
+    # Retrieve the network adapter
+    $newVM | Get-NetworkAdapter | Set-NetworkAdapter -NetworkName $network
     # Creates a new snapshot called "Base" and removes the temp.
     $newVM | New-Snapshot -Name "Base"
     $linkedVM | Remove-VM
@@ -203,4 +204,18 @@ Function FullClone([string] $vm, $snap, $vmhost, $ds, $network)
     {
         break
     }
+}
+
+Function New-Network()
+{
+    $config = Get-480Config -config_path "/home/sbarrick/SYS-480/modules/480-utils/480.json"
+    $vsName = Read-Host "Enter the name for your new Virtual Switch"
+    $pgName = Read-Host "Etner the name for your new Port Group"
+
+    $virtualSwitch = New-VirtualSwitch -VMHost $config.esxi_host -Name $vsName -Server $config.vcenter_server
+    $portGroup = New-VirtualPortGroup -VirtualSwitch $virtualSwitch -Name $pgName
+
+    Write-Host -f "{$virtualSwitch.Name} and {$portGroup.Name} have been created"
+    return $virtualSwitch
+    return $portGroup
 }

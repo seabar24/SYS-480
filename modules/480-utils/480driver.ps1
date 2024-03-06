@@ -11,6 +11,9 @@ $db = Select-DB
 
 $snapshot = Get-Snapshot -VM $vm.Name | Select-Object -First 1
 
-$network = Select-Network -vm $vm.Name
+$network = Select-Network -esxi $config.esxi_host
 
 FullClone -vm $vm.Name -snap $snapshot -vmhost $config.esxi_host -ds $db -network $network
+
+New-Network
+
