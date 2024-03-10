@@ -1,18 +1,51 @@
 Import-Module "480-utils" -Force
-# Call the Banner Function
-480Banner 
-$config = Get-480Config -config_path "/home/sbarrick/SYS-480/modules/480-utils/480.json"
 
-480Connect -server $config.vcenter_server
+$quit = $false
 
-$vm = Select-VM -folder $config.vm_folder
+while ($quit -eq $false){
 
-$db = Select-DB
+    480Banner 
+    $config = Get-480Config -config_path "/home/sbarrick/SYS-480/modules/480-utils/480.json"
 
-$snapshot = Get-Snapshot -VM $vm.Name | Select-Object -First 1
+    480Connect -server $config.vcenter_server
 
-$switch = New-Network
+    $vm = Select-VM -folder $config.vm_folder
 
-$network = Select-Network -esxi $config.esxi_host
+    $powerOpt = Read-Host "Would you like to power on or off a VM (On/Off)"
 
-FullClone -vm $vm.Name -snap $snapshot -vmhost $config.esxi_host -ds $db -network $network
+    if ($powerOpt -match "^[oO]n$"){
+        
+        powerOn 
+    } elseif ($powerOpt -match "^[oO]ff$"){
+
+        powerOff
+    }
+
+    $db = Select-DB
+
+    $snapshot = Get-Snapshot -VM $vm.Name | Select-Object -First 1
+
+    $switch = New-Network
+
+    $network = Select-Network -esxi $config.esxi_host
+
+    $clone = FullClone -vm $vm.Name -snap $snapshot -vmhost $config.esxi_host -ds $db -network $network
+
+    if ($clone -eq $null){
+        $ans = Read-Host "Would you like to continue? (Y/N)"
+
+        if ($ans -match "^[yY]$"){
+            $quit = $false
+        } else {
+            $quit = $true
+        }
+    } else {
+        $ans = Read-Host "Would you like to continue? (Y/N)"
+
+        if ($ans -match "^[yY]$"){
+            $quit = $false
+        } else {
+            $quit = $true
+        }
+    }
+}

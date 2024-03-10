@@ -202,58 +202,115 @@ Function FullClone([string] $vm, $snap, $vmhost, $ds, $network)
         Write-Host $newVM.Name "has powered on!"
     } else
     {
-        break
+        return $null
     }
 }
 
 Function New-Network()
 {
     $config = Get-480Config -config_path "/home/sbarrick/SYS-480/modules/480-utils/480.json"
+
+    # Ask user to create a new Virtual Switch
     $vsName = Read-Host "Enter the name for your new Virtual Switch"
-    $pgName = Read-Host "Etner the name for your new Port Group"
+    $virtualSwitch = New-VirtualSwitch -VMHost $config.esxi_host -Name $vsName -Server $config.vcenter_server
 
-    if ($vsName -eq $pgName){
-        $virtualSwitch = New-VirtualSwitch -VMHost $config.esxi_host -Name $vsName -Server $config.vcenter_server
-        $portGroup = New-VirtualPortGroup -VirtualSwitch $virtualSwitch -Name $pgName
+    # Show all Virtual Switches
+    Write-Host "All Virtual Switches:"
+    Get-VirtualSwitch | ForEach-Object { Write-Host $_.Name }
 
-        Write-Host "Virtual Switch: $($virtualSwitch.Name) and Port Group: $($portGroup.Name) have been created"
-        return $virtualSwitch
-        return $portGroup
-    } else {
+    # Ask user to choose a Virtual Switch for creating a Port Group
+    $selectedSwitch = Read-Host "Enter the name of the Virtual Switch you want to use for creating a Port Group"
 
-        Write-Host "Conflicting arguments for Virtual Switch and Port Group. Make sure they are both the same" -ForegroundColor Red
-        New-Network
+    # Validate the selected Virtual Switch
+    $vsName = Get-VirtualSwitch -Name $selectedSwitch
+    if ($vsName -eq $null) {
+        Write-Host "Invalid Virtual Switch name. Please choose a valid Virtual Switch."
+        return
     }
 
+    # Ask user to create a Port Group for the selected Virtual Switch
+    $pgName = Read-Host "Enter the name for your new Port Group"
+    $portGroup = New-VirtualPortGroup -VirtualSwitch $vsName -Name $pgName
+
+    Write-Host "Virtual Switch: $($virtualSwitch.Name) and Port Group: $($portGroup.Name) have been created"
+
+    # Ask user if they want to remove a Virtual Switch or Port Group
     $rmSwitch = Read-Host "Would you like to remove a Virtual Switch? (Y/N)"
-    $rmPortGroup = Read-Host "Would you like to remove a Virtual Switch? (Y/N)"
+    if ($rmSwitch -match "^[yY]$"){
+        Get-VirtualSwitch | ForEach-Object { Write-Host $_.Name }
+        $virSwitchChosen = Read-Host "Enter the name of the Virtual Switch you wish to remove"
+        Remove-VirtualSwitch -VirtualSwitch $virSwitchChosen
 
-    if ($rmSwitch -eq "^[yY]$"){
-        # Code for removing Virtual Switch
-        Get-VirtualSwitch
-        Remove-VirtualSwitch -VirtualSwitch $virswichosen
-        if ($rmPortGroup -eq "^[yY]$"){
-            # Code for removing Virtual Port Group
-        } elif ($rmPortGroup -eq "^[nN]$"){
-            return
+        $rmPortGroup = Read-Host "Would you like to remove a Virtual Port Group? (Y/N)"
+        if ($rmPortGroup -match "^[yY]$"){
+            Get-VirtualPortGroup | ForEach-Object { Write-Host $_.Name }
+            $virPGchosen = Read-Host "Enter the name of the Virtual Port Group you wish to remove"
+            $portGroupToRemove = Get-VirtualPortGroup -Name $virPGchosen
+            Remove-VirtualPortGroup -VirtualPortGroup $portGroupToRemove
+        } elseif ($rmPortGroup -match "^[nN]$|^$"){
+            Write-Host "No Virtual Port Group will be removed."
+        } else {
+            Write-Host "Invalid option for removing Virtual Port Group."
         }
-    } elif ($rmSwitch -eq "^[^nN]$"){
-        if ($rmPortGroup -eq "^[yY]$"){
-            # Code for removing Virtual Port Group
-        } elif ($rmPortGroup -eq "^[nN]$"){
-            return
-        } elif ($rmPortGroup -eq " "){
-            return
-        }
-        return
-    } elif ($rmSwitch -eq " "){
-        if ($rmPortGroup -eq "^[yY]$"){
-            # Code for removing Virtual Port Group
-        } elif ($rmPortGroup -eq "^[nN]$"){
-            return
-        } elif ($rmPortGroup -eq " "){
-            return
-        }
-        return
+    } elseif ($rmSwitch -match "^[nN]$|^$"){
+        Write-Host "No Virtual Switch or Port Group will be removed."
+    } else {
+        Write-Host "Invalid option for removing Virtual Switch."
     }
+    return $virtualSwitch
+    return $portGroup
+}
+
+Function powerOn(){
+
+    $vmList = Get-VM | Where-Object {$_.PowerState -eq "PoweredOff"}
+
+    if ($vmList.Count -eq 0) {
+        Write-Host "All VMs are Powered On or there are no VMs within your Inventory." -ForegroundColor "Red"
+        return $null
+    }
+
+    for ($i = 0; $i -lt $vmList.Count; $i++)
+    {
+        Write-Host "$($i + 1). $($vmList[$i].Name)"
+    }
+
+    do{
+        $choice = Read-Host "Which index number [x] do you want to start?"
+        if (ErrorHandling -index $choice -maxIndex $vmList.Count){
+
+            $chosenVM = $vmList[$choice - 1].Name
+            $powerOn = Start-VM -VM $chosenVM
+            Write-Host "$($chosenVM.Name) has Powered On!"
+        }
+    } while ($chosenVM -eq $null)
+
+    return $powerOn
+}
+
+Function powerOff(){
+
+    $vmList = Get-VM | Where-Object {$_.PowerState -eq "PoweredOn"}
+
+    if ($vmList.Count -eq 0) {
+        Write-Host "All VMs are Powered Off or there are no VMs within your Inventory." -ForegroundColor "Red"
+        return $null
+    }
+
+    for ($i = 0; $i -lt $vmList.Count; $i++)
+    {
+        Write-Host "$($i + 1). $($vmList[$i].Name)"
+    }
+
+    do {   
+        $choice = Read-Host "Which index number [x] do you want to stop?"
+        if (ErrorHandling -index $choice -maxIndex $vmList.Count){
+
+            $chosenVM = $vmList[$choice - 1].Name
+            $powerOff = Stop-VM -VM $chosenVM
+            Write-Host "$($chosenVM.Name) has Powered On!"
+        }
+    } while ($chosenVM -eq $null)
+    
+    return $powerOff
 }
