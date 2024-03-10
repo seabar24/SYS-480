@@ -11,7 +11,7 @@ while ($quit -eq $false){
 
     $vm = Select-VM -folder $config.vm_folder
 
-    $powerOpt = Read-Host "Would you like to power on or off a VM (On/Off)"
+    $powerOpt = Read-Host "Would you like to power on or off a VM (On/Off) (Press 'Enter' for neither)"
 
     if ($powerOpt -match "^[oO]n$"){
         
@@ -25,11 +25,18 @@ while ($quit -eq $false){
 
     $snapshot = Get-Snapshot -VM $vm.Name | Select-Object -First 1
 
-    $switch = New-Network
+    $switchOpt = Read-Host "Would you like to create a new Virtual Switch? (Y/N)"
+
+    if ($switchOpt -match "^[yY]$"){
+
+        $switch = New-Network
+    }
 
     $network = Select-Network -esxi $config.esxi_host
 
     $clone = FullClone -vm $vm.Name -snap $snapshot -vmhost $config.esxi_host -ds $db -network $network
+
+    Get-IP -VM $clone
 
     if ($clone -eq $null){
         $ans = Read-Host "Would you like to continue? (Y/N)"

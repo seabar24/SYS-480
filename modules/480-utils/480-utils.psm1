@@ -200,9 +200,10 @@ Function FullClone([string] $vm, $snap, $vmhost, $ds, $network)
     {
         Start-VM -VM $newVM
         Write-Host $newVM.Name "has powered on!"
+        return $newVM
     } else
     {
-        return $null
+        return $newVM
     }
 }
 
@@ -276,7 +277,7 @@ Function powerOn(){
     }
 
     do{
-        $choice = Read-Host "Which index number [x] do you want to start?"
+        $choice = Read-Host "Which index number [x] do you want to start? (Press 'Enter' for none of these options)"
         if (ErrorHandling -index $choice -maxIndex $vmList.Count){
 
             $chosenVM = $vmList[$choice - 1].Name
@@ -303,7 +304,7 @@ Function powerOff(){
     }
 
     do {   
-        $choice = Read-Host "Which index number [x] do you want to stop?"
+        $choice = Read-Host "Which index number [x] do you want to stop? (Press 'Enter' for none of these options)"
         if (ErrorHandling -index $choice -maxIndex $vmList.Count){
 
             $chosenVM = $vmList[$choice - 1].Name
@@ -311,6 +312,16 @@ Function powerOff(){
             Write-Host "$($chosenVM.Name) has Powered On!"
         }
     } while ($chosenVM -eq $null)
-    
+
     return $powerOff
+}
+
+Function Get-IP([string] $VM){
+    
+    $mac = Get-NetworkAdapter -VM $VM | Where-Object {$_.MacAddress}
+    $ipaddr = $VM.Guest.IPAddress[0]
+    $name = $VM.Name
+
+    return "Name: $($name)\nMAC Address: $($mac)\nIP Address: $ipaddr"
+
 }
