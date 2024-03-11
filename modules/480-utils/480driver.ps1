@@ -36,7 +36,7 @@ while ($quit -eq $false){
 
     $clone = FullClone -vm $vm.Name -snap $snapshot -vmhost $config.esxi_host -ds $db -network $network
 
-    Get-IP -VM $clone
+    Get-IP
 
     if ($clone -eq $null){
         $ans = Read-Host "Would you like to continue? (Y/N)"

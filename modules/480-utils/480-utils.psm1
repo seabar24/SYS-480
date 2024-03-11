@@ -263,7 +263,8 @@ Function New-Network()
 }
 
 Function powerOn(){
-
+    # This function gets a list of all VMs currently powered off
+    # And turns on the VM chosen
     $vmList = Get-VM | Where-Object {$_.PowerState -eq "PoweredOff"}
 
     if ($vmList.Count -eq 0) {
@@ -273,7 +274,7 @@ Function powerOn(){
 
     for ($i = 0; $i -lt $vmList.Count; $i++)
     {
-        Write-Host "$($i + 1). $($vmList[$i].Name)"
+        Write-Host "[$($i + 1)] $($vmList[$i].Name)"
     }
 
     do{
@@ -290,7 +291,8 @@ Function powerOn(){
 }
 
 Function powerOff(){
-
+    # This function gets a list of all VMs currently powered on
+    # And turns off the VM chosen
     $vmList = Get-VM | Where-Object {$_.PowerState -eq "PoweredOn"}
 
     if ($vmList.Count -eq 0) {
@@ -300,7 +302,7 @@ Function powerOff(){
 
     for ($i = 0; $i -lt $vmList.Count; $i++)
     {
-        Write-Host "$($i + 1). $($vmList[$i].Name)"
+        Write-Host "[$($i + 1)] $($vmList[$i].Name)"
     }
 
     do {   
@@ -316,12 +318,22 @@ Function powerOff(){
     return $powerOff
 }
 
-Function Get-IP([string] $VM){
-    
-    $mac = Get-NetworkAdapter -VM $VM | Where-Object {$_.MacAddress}
-    $ipaddr = $VM.Guest.IPAddress[0]
-    $name = $VM.Name
+Function Get-IP([string] $VM) {
+    # This is a function that will print a list of all VMs
+    # And return the Name, MAC Address, and IP Address of a chosen VM
+    $i = 0
+    $vms = Get-VM 
+    $vms | ForEach-Object { Write-Host "[$($i + 1)] $($_.Name)"; $i++ }
 
-    return "Name: $($name)\nMAC Address: $($mac)\nIP Address: $ipaddr"
+    do {   
+        $VMpicked = Read-Host "Enter the index [x] for which VM you want to get Network Information"
+        if (ErrorHandling -index $VMpicked -maxIndex $vms.Count) {
 
+            $VMObj = $vms[$VMpicked - 1]
+            $mac = Get-NetworkAdapter -VM $VMObj | Select-Object -ExpandProperty MacAddress -First 1
+            $ipaddr = $VMObj.Guest.IPAddress[0]
+        }
+    } while ($VMObj -eq $null)
+
+    return "Name: $($VMObj.Name)`nMAC Address: $($mac)`nIP Address: $($ipaddr)"
 }
