@@ -311,7 +311,7 @@ Function powerOff(){
 
             $chosenVM = $vmList[$choice - 1].Name
             $powerOff = Stop-VM -VM $chosenVM
-            Write-Host "$($chosenVM.Name) has Powered On!"
+            Write-Host "$($chosenVM.Name) has Powered On!`n"
         }
     } while ($chosenVM -eq $null)
 
@@ -327,8 +327,7 @@ Function Get-IP([string] $VM) {
 
     do {   
         $VMpicked = Read-Host "Enter the index [x] for which VM you want to get Network Information"
-        if (ErrorHandling -index $VMpicked -maxIndex $vms.Count) {
-
+        if (ErrorHandling -index $VMpicked -maxIndex ($vms.Count - 1)) {
             $VMObj = $vms[$VMpicked - 1]
             $mac = Get-NetworkAdapter -VM $VMObj | Select-Object -ExpandProperty MacAddress -First 1
             $ipaddr = $VMObj.Guest.IPAddress[0]

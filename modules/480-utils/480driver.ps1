@@ -28,7 +28,7 @@ while ($quit -eq $false){
     $switchOpt = Read-Host "Would you like to create a new Virtual Switch? (Y/N)"
 
     if ($switchOpt -match "^[yY]$"){
-
+        
         $switch = New-Network
     }
 
