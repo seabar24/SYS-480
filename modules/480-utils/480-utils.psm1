@@ -318,7 +318,7 @@ Function powerOff(){
     return $powerOff
 }
 
-Function Get-IP([string] $VM) {
+Function Get-IP() {
     # This is a function that will print a list of all VMs
     # And return the Name, MAC Address, and IP Address of a chosen VM
     $i = 0
