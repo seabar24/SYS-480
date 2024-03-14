@@ -1,13 +1,9 @@
 interfaces {
     ethernet eth0 {
-        address 10.0.17.200/24
-        description 480-WAN
-        hw-id 00:50:56:b1:62:63
+        address {{ wan_ip }}/24
     }
     ethernet eth1 {
-        address 10.0.5.2/24
-        description BLUE-LAN
-        hw-id 00:50:56:b1:eb:f1
+        address {{ lan_ip }}/24
     }
     loopback lo {
     }
@@ -17,7 +13,7 @@ nat {
         rule 10 {
             outbound-interface eth0
             source {
-                address 10.0.5.0/24
+                address {{ lan }}
             }
             translation {
                 address masquerade
@@ -28,20 +24,15 @@ nat {
 protocols {
     static {
         route 0.0.0.0/0 {
-            next-hop 10.0.17.2 {
-            }
-            next-hop 192.168.7.250 {
-            }
+            next-hop {{ gateway }}
         }
     }
 }
 service {
     dns {
         forwarding {
-            allow-from 10.0.17.0/24
-            allow-from 10.0.5.0/24
-            listen-address 10.0.17.2
-            listen-address 10.0.5.2
+            allow-from {{ lan }}
+            listen-address {{ lan_ip }}
             system
         }
     }
@@ -73,14 +64,11 @@ system {
     login {
         user vyos {
             authentication {
-                encrypted-password $6$rexBgmH1CAaLQd2P$i/Tjakj1idX.LR3ZRPTWsw6hPF4IbjpYRyXXtZ9Tvaz0JudmP6u0bYL.uTAJlIiPDmz9Ph2/kaLkw2dIQoK4v0
-                plaintext-password ""
+                encrypted-password {{ password_hash }}
             }
         }
     }
-    name-server 192.168.4.4
-    name-server 192.168.4.5
-    name-server 10.0.17.4
+    name-server {{ name_server }}
     ntp {
         server time1.vyos.net {
         }
