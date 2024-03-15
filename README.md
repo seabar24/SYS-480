@@ -10,3 +10,5 @@
 [Milestone 4 - VCenter AD Integration, PowerCLI, and Linked Clones](https://github.com/seabar24/SYS-480/wiki/Milestone-4-%E2%80%90-VCenter-AD-Integration,-PowerCLI-and-Linked-Clones)
 
 [Milestone 5 - 480.psm1](https://github.com/seabar24/SYS-480/wiki/Milestone-5-%E2%80%90-480.psm1)
+
+[Milestone 6 - Blue Network and vyos Provisioning with Ansible](https://github.com/seabar24/SYS-480/wiki/Milestone-6-%E2%80%90-Blue-Network-and-vyos-Provisioning-with-Ansible)
