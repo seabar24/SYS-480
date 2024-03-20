@@ -5,5 +5,19 @@ linux:
       hosts:
         10.0.5.77:
           hostname: rocky-3
-          lan_ip: 10.0.5.10
+          lan_ip: 10.0.5.12
         10.0.5.76: 
+          hostname: rocky-2
+          lan_ip: 10.0.5.11
+        10.0.5.75:
+          hostname: rocky-1
+          lan_ip: 10.0.5.10
+      vars:
+        device: ens192
+  vars:
+    public_key: "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAABgQDV8/A5Qv90cjKVZEszws/VNGnbLCA851d+tLerMHj+ZE0DaThOUN1St1q6K5rItxI1hPx7m+s82tabhruIlqs3YpOmFKsalef4+hTxG7UKtrtAkcwo2O2OE0nPT3tXqbB4SsIgGQ8oB3AV83FVh4HvWT1K3MgOGOQFs2I7cMt/04CjDVRDt0X3yro7FjkpYJR46n9u5/74BWBK+Rnm9AlLt9TbWbON46SOjHeYWoCYVBD5E9p57HEgHss5YxASWkSsyX4BlOF/qCYbQ+rGITaQrN83x8ovbW/l/NDfU//6jdymoTs2/vL983pcrTeGy0Td0DXRlbrzeLvwnPYzmO17iuVaUGcq0nYuacBdbyuT2AqvdNLs0FdQHxM2rHbAk05xhTouVqAXCjZlWt4qpC1RLF+mbwh6pEKb4fOumGXPTKxTyA0ole/Lx55C0HpIcGNgmBIBUz7y0gxvKiHxEnT2xesYeqG8EPi0kEijysA0z5nK8HvKbkwctIaMQxdn0d8= sbarrick@xubuntu-wan"
+    ansible_user: deployer
+    prefix: 24
+    gateway: 10.0.5.2
+    name_server: 10.0.5.5
+    domain: blue1.local

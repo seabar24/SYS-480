@@ -1,3 +1,4 @@
+# This playbook performs post-provisioning configuration of Rocky
 - name: rocky config
   hosts: rocky
   tasks:
@@ -24,15 +25,20 @@
       become: yes
 
     - name: create a drop in entry in /etc/sudoers.d/480
-    blockinfile:
-      dest: "/etc/sudoers.d/480"
-      block: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL"
-    become: yes
+      blockinfile:
+        dest: "/etc/sudoers.d/480"
+        block: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL"
+      become: yes
 
     - name: set the hostname
       hostname: 
-        name: {{hostname}}
+        name: "{{hostname}}"
       become: yes
+
+    - name: add host to hosts file
+      lineinfile:
+        path: /etc/hosts
+        line: "127.0.1.1 {{ hostname }}"
 
     - name: run nmcli
       #nmcli connection modify ens192 ipv4.address 10.0.5.10/24 ipv4.gateway 10.0.5.2 ipv4.dns '10.0.5.5 10.0.5.2' ipv4.method manual
