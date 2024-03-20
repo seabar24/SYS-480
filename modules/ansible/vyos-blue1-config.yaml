@@ -1,35 +1,28 @@
 #Playbook to create DHCP pool on fw-blue1
-name: vyos network config
-hosts: vyos
-tasks:
-- name: Show Version Info
-  vyos_command:
-    commands: show version
-  register: version
-
-- name: Show Interfaces for fw-Blue1
-  vyos_command:
-    commands: show interfaces ethernet {{ item }}
-  with_items:
-  - eth0
-  - eth1
+- name: vyos network config
+  hosts: vyos
+  tasks:
+  - name: Show Version Info
+    vyos_command:
+      commands: show version
+    register: version
   
-- name: config vyos dhcp
-  vyos_config:
-    save: yes
-    lines:
-      - set service dhcp-server global-aparamters 'local-address {{ lan_ip }};'
-      - set service dhcp-server shared-network-name {{ shared_network }} authoritative
-      - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} default-router '{{ lan_ip }}'
-      - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} name-server '{{ dhcp_name_server }}'
-      - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} domain-name '{{ dhcp_domain }}'
-      - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} lease '86400'
-      - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} range {{ shared_network }}-POOL start '10.0.5.75'
-      - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} range {{ shared_network}}-POOL stop '10.0.5.125'
+  - name: config vyos dhcp
+    vyos_config:
+      save: yes
+      lines:
+        - set service dhcp-server global-parameters 'local-address {{ lan_ip }};'
+        - set service dhcp-server shared-network-name {{ shared_network }} authoritative
+        - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} default-router '{{ lan_ip }}'
+        - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} name-server '{{ dhcp_name_server }}'
+        - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} domain-name '{{ dhcp_domain }}'
+        - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} lease '86400'
+        - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} range {{ shared_network }}-POOL start '10.0.5.75'
+        - set service dhcp-server shared-network-name {{ shared_network }} subnet {{ lan }} range {{ shared_network }}-POOL stop '10.0.5.125'
 
-- name: Show Interfaces for fw-Blue1
-  vyos_command:
-    commands: show interfaces ethernet {{ item }}
-  with_items:
-  - eth0
-  - eth1
+  - name: Show Interfaces for fw-Blue1
+    vyos_command:
+      commands: show interfaces ethernet {{ item }}
+    with_items:
+    - eth0
+    - eth1

@@ -1,0 +1,9 @@
+linux:
+  hosts:
+  children: 
+    rocky:
+      hosts:
+        10.0.5.77:
+          hostname: rocky-3
+          lan_ip: 10.0.5.10
+        10.0.5.76: 

@@ -318,21 +318,19 @@ Function powerOff(){
     return $powerOff
 }
 
-Function Get-IP() {
+Function Get-IP($VM) {
     # This is a function that will print a list of all VMs
     # And return the Name, MAC Address, and IP Address of a chosen VM
-    $i = 0
-    $vms = Get-VM 
-    $vms | ForEach-Object { Write-Host "[$($i + 1)] $($_.Name)"; $i++ }
 
-    do {   
-        $VMpicked = Read-Host "Enter the index [x] for which VM you want to get Network Information"
-        if (ErrorHandling -index $VMpicked -maxIndex ($vms.Count - 1)) {
-            $VMObj = $vms[$VMpicked - 1]
-            $mac = Get-NetworkAdapter -VM $VMObj | Select-Object -ExpandProperty MacAddress -First 1
-            $ipaddr = $VMObj.Guest.IPAddress[0]
-        }
-    } while ($VMObj -eq $null)
+    $config = Get-480Config -config_path "/home/sbarrick/SYS-480/modules/480-utils/480.json"
+    480Connect -server $config.vcenter_server
 
-    return "Name: $($VMObj.Name)`nMAC Address: $($mac)`nIP Address: $($ipaddr)"
+    $vms = Get-VM -Name $VM
+
+    foreach($vm in $vms){
+        $mac=Get-NetworkAdapter -VM $vm | Select-Object -ExpandProperty MacAddress
+        $ipaddr=$vm.Guest.IPAddress[0]
+        $info="Name: $($VM)`nMAC Address: $($mac)`nIP Address: $($ipaddr)"
+        Write-Host $info
+    }
 }
