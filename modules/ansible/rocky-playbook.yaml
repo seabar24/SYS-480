@@ -39,6 +39,7 @@
       lineinfile:
         path: /etc/hosts
         line: "127.0.1.1 {{ hostname }}"
+      become: yes
 
     - name: run nmcli
       #nmcli connection modify ens192 ipv4.address 10.0.5.10/24 ipv4.gateway 10.0.5.2 ipv4.dns '10.0.5.5 10.0.5.2' ipv4.method manual
