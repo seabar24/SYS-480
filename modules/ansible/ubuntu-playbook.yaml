@@ -7,31 +7,31 @@
       path: "/home/{{ ansible_user }}/.ssh"
       state: directory
       mode: 0700
-
+    
   - name: create authorized_key file
     file:
       path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
       state: touch
       mode: 0644
-
+  
   - name: copy over key block and append to authorized_keys
     blockinfile:
       dest: "/home/{{ ansible_user }}/.ssh/authorized_keys"
       block: "{{ public_key }}"
-
+  
   - name: create sudoers dropin file for 480
     file:
       path: /etc/sudoers.d/480
       state: touch
       mode: 0400
     become: yes
-
+  
   - name: create a drop in entry in /etc/sudoers.d/480
     blockinfile:
       dest: /etc/sudoers.d/480
       block: "{{ ansible_user }}  ALL=(ALL) NOPASSWD: ALL"
     become: yes
-
+  
   - name: set hostname
     hostname:
       name: "{{hostname}}"
