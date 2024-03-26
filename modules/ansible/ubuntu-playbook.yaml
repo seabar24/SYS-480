@@ -32,7 +32,7 @@
       block: "{{ ansible_user }}  ALL=(ALL) NOPASSWD: ALL"
     become: yes
   
-  - name: set hostname
+  - name: set the hostname
     hostname:
       name: "{{hostname}}"
     become: yes

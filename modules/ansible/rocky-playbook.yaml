@@ -7,11 +7,13 @@
         path: "/home/{{ ansible_user }}/.ssh/"
         state: directory
         mode: 0700
+
     - name: create authorized keys file
       file: 
         path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
         state: touch
         mode: 0644
+
     - name: copy over key block and append to authorized keys
       blockinfile:
         dest: "/home/{{ ansible_user }}/.ssh/authorized_keys"
