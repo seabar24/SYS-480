@@ -1,62 +1,59 @@
-# This playbook performs post-provisioning configuration of Rocky
-- name: rocky config
-  hosts: rocky
+# This playbook performs post-provisioning configuration of Ubuntu
+- name: ubuntu config
+  hosts: ubuntu
   tasks:
-    - name: create the .ssh directory if it is not there
-      file:
-        path: "/home/{{ ansible_user }}/.ssh/"
-        state: directory
-        mode: 0700
-    - name: create authorized keys file
-      file: 
-        path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
-        state: touch
-        mode: 0644
-    - name: copy over key block and append to authorized keys
-      blockinfile:
-        dest: "/home/{{ ansible_user }}/.ssh/authorized_keys"
-        block: "{{ public_key }}"
+  - name: create the .ssh directory if it is not there
+    file:
+      path: "/home/{{ ansible_user }}/.ssh"
+      state: directory
+      mode: 0700
+    
+  - name: create authorized_key file
+    file:
+      path: "/home/{{ ansible_user }}/.ssh/authorized_keys"
+      state: touch
+      mode: 0644
+  
+  - name: copy over key block and append to authorized_keys
+    blockinfile:
+      dest: "/home/{{ ansible_user }}/.ssh/authorized_keys"
+      block: "{{ public_key }}"
+  
+  - name: create sudoers dropin file for 480
+    file:
+      path: /etc/sudoers.d/480
+      state: touch
+      mode: 0400
+    become: yes
+  
+  - name: create a drop in entry in /etc/sudoers.d/480
+    blockinfile:
+      dest: /etc/sudoers.d/480
+      block: "{{ ansible_user }}  ALL=(ALL) NOPASSWD: ALL"
+    become: yes
+  
+  - name: set hostname
+    hostname:
+      name: "{{ hostname }}"
+    become: yes
 
-    - name: create sudoers dropin file for 480
-      file:
-        path: /etc/sudoers.d/480
-        state: touch
-        mode: 0440
-      become: yes
+  - name: add host to hosts file
+    lineinfile:
+      path: /etc/hosts
+      line: "127.0.1.1  {{ hostname }}"
+    become: yes
 
-    - name: create a drop in entry in /etc/sudoers.d/480
-      blockinfile:
-        dest: "/etc/sudoers.d/480"
-        block: "{{ ansible_user }} ALL=(ALL) NOPASSWD: ALL"
-      become: yes
+  - name: Setup netplan
+    ansible.builtin.template:
+      src: files/vyos/netplan.yaml.j2
+      dest: /etc/netplan/00-installer-config.yaml
+      mode: "0644"
+      owner: root
+      group: root
+    become: yes
 
-    - name: set the hostname
-      hostname: 
-        name: "{{hostname}}"
-      become: yes
-
-    - name: add host to hosts file
-      lineinfile:
-        path: /etc/hosts
-        line: "127.0.1.1 {{ hostname }}"
-      become: yes
-
-    - name: run nmcli
-      #nmcli connection modify ens192 ipv4.address 10.0.5.10/24 ipv4.gateway 10.0.5.2 ipv4.dns '10.0.5.5 10.0.5.2' ipv4.method manual
-      nmcli:
-        conn_name: "{{device}}"
-        ip4: "{{lan_ip}}/24"
-        gw4: "{{gateway}}"
-        state: present
-        type: ethernet
-        dns4:
-          - "{{name_server}}"
-          - "{{gateway}}"
-        method4: manual
-      become: yes
-
-    - name: bounce the box
-      shell: "sleep 5 && shutdown -r"
-      become: yes
-      async: 1
-      poll: 0
+  - name: bounce the box
+    shell: "sleep 5 && shutdown -r"
+    become: yes
+    async: 1
+    poll: 0
