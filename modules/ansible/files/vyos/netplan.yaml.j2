@@ -1,6 +1,6 @@
 network:
   ethernets:
-    {{ ansible_default_ipv4.interface }}:
+    {{device}}:
       addresses:
         - {{ lan_ip }}/24
       nameservers:
