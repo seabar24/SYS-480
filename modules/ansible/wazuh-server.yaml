@@ -1,0 +1,54 @@
+- hosts: wazuh_server
+  roles:
+    - role: /etc/ansible/roles/wazuh-ansible/roles/wazuh/wazuh-indexer
+      perform_installation: false
+  become: no
+  vars:
+    indexer_node_master: true
+    instances:
+      node1:
+        name: node-1
+        ip: 10.0.5.50
+        role: indexer
+  tags:
+    - generate-certs
+
+- hosts: wazuh_server
+  become: yes
+  become_user: root
+  tasks:
+    - name: Install wazuh-indexer
+      ansible.builtin.package:
+        name: wazuh-index-4.7.3
+        state: present
+
+    - name: Install wazuh-dashboard
+      ansible.builtin.package:
+        name: wazuh-dashboard-4.7.3
+        state: present
+
+  roles:
+    - role: /etc/ansible/roles/ansible-wazuh/roles/wazuh/wazuh-indexer
+    - role: /etc/ansible/roles/ansible-wazuh/roles/wazuh/wazuh-dashboard
+
+  vars:
+    single_node: true
+    indexer_network_host: 10.0.5.50
+    ansible_shell_allow_world_readable_temp: true
+    instances:
+      node1:
+        name: node-1
+        ip: 10.0.5.50
+        role: indexer
+    wazuh_api_credentials:
+      - id: default
+        url: https://10.0.5.50
+        port: 55000
+
+- hosts: wazuh_server
+  roles:
+    - role: /etc/ansible/roles/wazuh-ansible/roles/wazuh/ansible-wazuh-manager
+    - role: /etc/ansible/roles/wazuh-ansible/roles/wazuh/ansible-filebeat-oss
+      filebeat_node_name: node-1
+      filebeat_output_indexer_hosts:
+      - "10.0.5.50"

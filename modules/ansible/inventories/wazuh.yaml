@@ -1,0 +1,5 @@
+[wazuh_server]
+10.0.5.50 ansible_ssh_user=deployer
+
+[wazuh_agents]
+10.0.5.51 ansible_ssh_user=deployer

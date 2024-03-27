@@ -12,6 +12,12 @@ linux:
         10.0.5.75:
           hostname: rocky-1
           lan_ip: 10.0.5.10
+        10.0.5.89:
+          hostname: wazuh-server
+          lan_ip: 10.0.5.50
+        10.0.5.90:
+          hostname: wazuh-agent
+          lan_ip: 10.0.5.51
       vars:
         device: ens33
     
